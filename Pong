@@ -1,0 +1,106 @@
+class Paddle:
+    def __init__(self, x, y, width ,height ,speed):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.speed = speed
+       
+    def move(self):
+        if keyPressed:
+            if key == 'q' and self.x > 0:
+                self.x -= self.speed
+            elif key == 'd' and self.x < width - self.width:
+                self.x += self.speed
+               
+    def display(self):
+        fill(0, 0, 255)
+        rect(self.x ,self.y ,self.width ,self.height)
+       
+    def check_collision(self, ball):
+        if (ball.y + ball.diameter / 2 >= self.y and ball.x >= self.x and ball.x <= self.x + self.width):
+            ball.yspeed *= -1
+            return True
+        return False
+   
+class Ball:
+    def __init__(self, x, y, diameter, xspeed, yspeed):
+        self.x = x
+        self.y = y
+        self.diameter = diameter
+        self.xspeed = xspeed
+        self.yspeed = yspeed
+       
+    def move(self):
+        self.x += self.xspeed
+        self.y += self.yspeed
+       
+    def display(self):
+        fill(0, 0, 255)
+        ellipse(self.x, self.y, self.diameter, self.diameter)
+       
+    def check_edges(self):
+        if self.x - self.diameter / 2 <= 0 or self.x + self.diameter / 2 >= width:
+            self.xspeed *= -1
+        if self.y - self.diameter / 2 <= 0:
+            self.yspeed *= -1
+       
+    def reset(self):
+        self.x = random(self.diameter / 2, width - self.diameter)
+        self.y = random(self.diameter / 2, height / 2)
+   
+paddle = None
+ball = None
+ball_2 = None
+score = 0
+lives = 3
+highscore = 0
+
+def setup():
+    global paddle, ball, ball_2, score
+    textSize(32)
+    textAlign(CENTER, CENTER)
+    size(600, 400)
+    noStroke()
+    paddle = Paddle(250, 350, 100, 10, 10)
+    ball = Ball(300, 200, 20, 3, 3)
+    ball_2 = Ball(300, 100, 20, 3, 3)
+
+def draw():
+    global score, lives, highscore
+    background(0)
+    paddle.move()
+    paddle.display()
+   
+    ball.move()
+    ball.display()
+    ball.check_edges()
+   
+    ball_2.move()
+    ball_2.display()
+    ball_2.check_edges()
+    if score > highscore:
+        highscore = score
+    if paddle.check_collision(ball) or paddle.check_collision(ball_2):
+        score += 1
+       
+    fill(255)
+    text("Score: " + str(score), width / 2, 30)
+    text("Lives: " + str(lives), width / 2, 70)
+    text("highscore: " + str(highscore), width / 2, 110)
+   
+    if ball.y + ball.diameter / 2 > height:
+        ball.reset()
+        lives -= 1
+       
+    if ball_2.y + ball_2.diameter / 2 > height:
+        ball_2.reset()
+        lives -= 1
+       
+    if lives == 0:
+        #if score > highscore:
+            #highscore = score
+        score = 0
+        ball.reset()
+        ball_2.reset()
+        lives = 3
